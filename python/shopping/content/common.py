@@ -109,6 +109,7 @@ def init(config={}):
 
 
   credentials = auth.authorize(config)
+  print("CREDENTIALS", credentials)
   auth_http = google_auth_httplib2.AuthorizedHttp(
       credentials, http=http.set_user_agent(
           http.build_http(), _constants.APPLICATION_NAME))

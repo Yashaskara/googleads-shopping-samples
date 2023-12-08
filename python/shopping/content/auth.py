@@ -44,36 +44,38 @@ def authorize(config):
       An google.auth.credentials.Credentials object suitable for
       accessing the Content API.
   """
-  try:
-    credentials, _ = google.auth.default(scopes=[_constants.CONTENT_API_SCOPE])
-    print('Using application default credentials.')
-    return credentials
-  except google.auth.exceptions.DefaultCredentialsError:
-    pass  # Can safely ignore this error, since it just means none were found.
+  # try:
+  #   credentials, _ = google.auth.default(scopes=[_constants.CONTENT_API_SCOPE])
+  #   print('Using application default credentials.')
+    
+  #   return credentials
+  # except google.auth.exceptions.DefaultCredentialsError:
+  #   pass  # Can safely ignore this error, since it just means none were found.
   if 'path' not in config:
     print('Must use Application Default Credentials with no configuration.')
     sys.exit(1)
-  service_account_path = os.path.join(config['path'],
-                                      _constants.SERVICE_ACCOUNT_FILE)
-  client_secrets_path = os.path.join(config['path'],
-                                     _constants.CLIENT_SECRETS_FILE)
+  service_account_path = config["path"]
+  # service_account_path = os.path.join(config['path'],
+  #                                     _constants.SERVICE_ACCOUNT_FILE)
+  # client_secrets_path = os.path.join(config['path'],
+  #                                    _constants.CLIENT_SECRETS_FILE)
   if os.path.isfile(service_account_path):
     print('Using service account credentials from %s.' % service_account_path)
     return service_account.Credentials.from_service_account_file(
         service_account_path,
         scopes=[_constants.CONTENT_API_SCOPE])
-  elif os.path.isfile(client_secrets_path):
-    print('Using OAuth2 client secrets from %s.' % client_secrets_path)
-    storage = token_storage.Storage(config)
-    credentials = storage.get()
-    if credentials and credentials.valid:
-      return credentials
-    client_config = token_storage.retrieve_client_config(config)
-    auth_flow = flow.InstalledAppFlow.from_client_config(
-        client_config, scopes=[_constants.CONTENT_API_SCOPE])
-    credentials = auth_flow.run_local_server(authorization_prompt_message='')
-    storage.put(credentials)
-    return credentials
+  # elif os.path.isfile(client_secrets_path):
+  #   print('Using OAuth2 client secrets from %s.' % client_secrets_path)
+  #   storage = token_storage.Storage(config)
+  #   credentials = storage.get()
+  #   if credentials and credentials.valid:
+  #     return credentials
+  #   client_config = token_storage.retrieve_client_config(config)
+  #   auth_flow = flow.InstalledAppFlow.from_client_config(
+  #       client_config, scopes=[_constants.CONTENT_API_SCOPE])
+  #   credentials = auth_flow.run_local_server(authorization_prompt_message='')
+  #   storage.put(credentials)
+  #   return credentials
   print('No OAuth2 authentication files found. Checked:', file=sys.stderr)
   print('- Google Application Default Credentials', file=sys.stderr)
   print('- %s' % service_account_path, file=sys.stderr)
