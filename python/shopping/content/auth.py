@@ -79,7 +79,7 @@ def authorize(config):
   print('No OAuth2 authentication files found. Checked:', file=sys.stderr)
   print('- Google Application Default Credentials', file=sys.stderr)
   print('- %s' % service_account_path, file=sys.stderr)
-  print('- %s' % client_secrets_path, file=sys.stderr)
+  # print('- %s' % client_secrets_path, file=sys.stderr)
   print('Please read the accompanying documentation.', file=sys.stderr)
   sys.exit(1)
   return None
