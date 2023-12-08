@@ -37,7 +37,7 @@ import six.moves.urllib.parse
 
 # Authenticate and return the Content API service along with any command-line
 # flags/arguments.
-def init(argv, doc, parents=None, sandbox=False):
+def init(config={}):
   """A common initialization routine for the Content API samples.
 
   Args:
@@ -51,60 +51,62 @@ def init(argv, doc, parents=None, sandbox=False):
     config is the configuration JSON in Python form, and flags
     are the parsed command-line flags.
   """
-  service = None
-  sandbox_service = None
-  flags = None
-  parent_parsers = []
-  if parents is not None:
-    parent_parsers.extend(parents)
+  # service = None
+  # sandbox_service = None
+  # flags = None
+  # parent_parsers = []
+  # if parents is not None:
+  #   parent_parsers.extend(parents)
 
-  parser = argparse.ArgumentParser(
-      description=doc,
-      formatter_class=argparse.RawDescriptionHelpFormatter,
-      parents=parent_parsers)
-  parser.add_argument(
-      '--config_path',
-      metavar='PATH',
-      default=os.path.expanduser('~/shopping-samples'),
-      help='configuration directory for the Shopping samples')
-  parser.add_argument(
-      '--noconfig',
-      action='store_true',
-      help='run samples with no configuration directory')
-  parser.add_argument(
-      '--log_file',
-      metavar='FILE',
-      help='filename for logging API requests and responses'
-  )
-  flags = parser.parse_args(argv[1:])
+  # parser = argparse.ArgumentParser(
+  #     description=doc,
+  #     formatter_class=argparse.RawDescriptionHelpFormatter,
+  #     parents=parent_parsers)
+  # parser.add_argument(
+  #     '--config_path',
+  #     metavar='PATH',
+  #     default=os.path.expanduser('~/shopping-samples'),
+  #     help='configuration directory for the Shopping samples')
+  # parser.add_argument(
+  #     '--noconfig',
+  #     action='store_true',
+  #     help='run samples with no configuration directory')
+  # parser.add_argument(
+  #     '--log_file',
+  #     metavar='FILE',
+  #     help='filename for logging API requests and responses'
+  # )
+  # flags = parser.parse_args(argv[1:])
 
-  if flags.log_file:
-    logging.basicConfig(filename=flags.log_file, level=logging.INFO)
-    model.dump_request_response = True
+  # if flags.log_file:
+  #   logging.basicConfig(filename=flags.log_file, level=logging.INFO)
+  #   model.dump_request_response = True
 
-  config = {}
-  if not flags.noconfig:
-    if not os.path.isdir(flags.config_path):
-      print(
-          'Configuration directory "%s" does not exist.' % flags.config_path,
-          file=sys.stderr)
-      sys.exit(1)
+  # config = {}
+  # if not flags.noconfig:
+  #   if not os.path.isdir(flags.config_path):
+  #     print(
+  #         'Configuration directory "%s" does not exist.' % flags.config_path,
+  #         file=sys.stderr)
+  #     sys.exit(1)
 
-    content_path = os.path.join(flags.config_path, 'content')
-    if not os.path.isdir(content_path):
-      print(
-          'Content API configuration directory "%s" does not exist.' %
-          content_path,
-          file=sys.stderr)
-      sys.exit(1)
+  #   content_path = os.path.join(flags.config_path, 'content')
+  #   if not os.path.isdir(content_path):
+  #     print(
+  #         'Content API configuration directory "%s" does not exist.' %
+  #         content_path,
+  #         file=sys.stderr)
+  #     sys.exit(1)
 
-    config_file = os.path.join(content_path, 'merchant-info.json')
-    if not os.path.isfile(config_file):
-      print('Configuration file %s does not exist.' % config_file)
-      print('Falling back to configuration based on authenticated user.')
-    else:
-      config = json.load(open(config_file, 'r'))
-    config['path'] = content_path
+  #   config_file = os.path.join(content_path, 'merchant-info.json')
+  #   if not os.path.isfile(config_file):
+  #     print('Configuration file %s does not exist.' % config_file)
+  #     print('Falling back to configuration based on authenticated user.')
+  #   else:
+  #     config = json.load(open(config_file, 'r'))
+  #   config['path'] = content_path
+
+
 
   credentials = auth.authorize(config)
   auth_http = google_auth_httplib2.AuthorizedHttp(
@@ -122,26 +124,26 @@ def init(argv, doc, parents=None, sandbox=False):
         _constants.SERVICE_VERSION,
         discoveryServiceUrl=discovery_url,
         http=auth_http)
-    if sandbox:
-      sandbox_service = discovery.build(
-          _constants.SERVICE_NAME,
-          _constants.SANDBOX_SERVICE_VERSION,
-          discoveryServiceUrl=discovery_url,
-          http=auth_http)
+    # if sandbox:
+    #   sandbox_service = discovery.build(
+    #       _constants.SERVICE_NAME,
+    #       _constants.SANDBOX_SERVICE_VERSION,
+    #       discoveryServiceUrl=discovery_url,
+    #       http=auth_http)
   else:
     service = discovery.build(
         _constants.SERVICE_NAME, _constants.SERVICE_VERSION, http=auth_http)
-    if sandbox:
-      sandbox_service = discovery.build(
-          _constants.SERVICE_NAME,
-          _constants.SANDBOX_SERVICE_VERSION,
-          http=auth_http)
+    # if sandbox:
+    #   sandbox_service = discovery.build(
+    #       _constants.SERVICE_NAME,
+    #       _constants.SANDBOX_SERVICE_VERSION,
+    #       http=auth_http)
 
   # Now that we have a service object, fill in anything missing from the
   # configuration using API calls.
   retrieve_remaining_config_from_api(service, config)
 
-  return (sandbox_service if sandbox else service, config, flags)
+  return (service, config)
 
 
 unique_id_increment = 0
